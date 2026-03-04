@@ -35,6 +35,10 @@ func callOpenRouterRaw(ctx context.Context, prompt string, model string) (string
 	}
 	defer res.Body.Close()
 	respBody, _ := io.ReadAll(res.Body)
-	// TODO: parse response and return text only
+	// Try to parse OpenRouter JSON and return the first choice content.
+	if txt, err := extractOpenRouterText(respBody); err == nil && txt != "" {
+		return txt, nil
+	}
+	// Fall back to returning raw body if parsing yields no content or errors
 	return string(respBody), nil
 }
