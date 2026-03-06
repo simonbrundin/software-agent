@@ -1,0 +1,13 @@
+- [ ] Kolla klart på TAC
+- [ ] Välj terminalagent. Goose, Pi, Opencode mm.
+- [ ] Gör så den kan köra kommandon från commands-mappen i agents-repot
+- [ ] Skapa dessa kommandon
+  - [ ] create-readme
+    - [ ] Se till att denna information finns i README.md.
+      - TECH STACK
+        - Frontend: Nuxt (Vue)
+        - Backend: Go
+        - Databas: PostgreSQL
+        - ORM: Drizzle
+        - Deployment / Orkestrering: Kubernetes
+        - CI (GitHub Actions)
