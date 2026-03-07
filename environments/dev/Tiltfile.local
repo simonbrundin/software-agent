@@ -1,0 +1,52 @@
+# ------------------------------------------------------------------
+# Local Development Mode
+# Runs database and backend in Docker, frontend locally
+# ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# Docker Compose Setup
+# ------------------------------------------------------------------
+
+docker_compose('./docker-compose.yml')
+
+# ------------------------------------------------------------------
+# PostgreSQL Database
+# ------------------------------------------------------------------
+
+dc_resource(
+  'postgres',
+  labels=['Database'],
+)
+
+# ------------------------------------------------------------------
+# Backend 
+# ------------------------------------------------------------------
+
+dc_resource(
+  'backend',
+  labels=['Backend'],
+)
+
+# ------------------------------------------------------------------
+# Frontend
+# ------------------------------------------------------------------
+
+dc_resource(
+  'frontend',
+  labels=['Frontend'],
+)
+
+# ------------------------------------------------------------------
+# Drizzle Studio
+# ------------------------------------------------------------------
+
+local_resource(
+  'Drizzle Studio',
+  serve_cmd='''
+    PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()") &&
+    DRIZZLE_PORT=$PORT bun run --cwd /home/simon/repos/software-agent/app/frontend db:studio
+  ''',
+  links=['http://localhost:3003'],
+  labels=['Database'],
+  resource_deps=['postgres'],
+)

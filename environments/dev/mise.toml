@@ -1,0 +1,5 @@
+[tools]
+neovim = "latest"
+yazi = "latest"
+zoxide = "latest"
+bun = "latest"

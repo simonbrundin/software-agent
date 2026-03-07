@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: software-agent-dev-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: software_agent
+    volumes:
+      - software-agent-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d software_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: /home/simon/repos/software-agent/app/backend
+      dockerfile: Dockerfile.dev
+    container_name: software-agent-dev-backend
+    ports:
+      - 8000:8000
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/software_agent
+    volumes:
+      - /home/simon/repos/software-agent/app/backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--reload"]
+
+  frontend:
+    build:
+      context: /home/simon/repos/software-agent/app/frontend
+      dockerfile: Dockerfile.dev
+    container_name: software-agent-dev-frontend
+    environment:
+      - NUXT_PUBLIC_API_BASE=http://localhost:8000
+    volumes:
+      - /home/simon/repos/software-agent/app/frontend:/app
+      - /app/node_modules
+      - /app/.nuxt
+    depends_on:
+      backend:
+        condition: service_started
+    command: ["bun", "run", "dev", "--host", "0.0.0.0"]
+
+volumes:
+  software-agent-postgres-data:
