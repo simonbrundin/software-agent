@@ -11,6 +11,11 @@
 - Deployment / Orkestrering: Kubernetes
 - CI (GitHub Actions)
 
+## Databas
+
+Schema Drawing:
+https://www.drawdb.app/editor/diagrams/8b11f8df-9402-4654-931c-5f20f78fb253
+
 ## Detta händer när ett nytt meddelande kommer in
 
 1. Spara meddelande i databas
