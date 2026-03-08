@@ -4,4 +4,5 @@
 
 ### Frontend
 
-Pakethanterare: Bun (inte npm eller pnpm)
+- Pakethanterare: Bun (inte npm eller pnpm)
+- Auth: https://nuxt.com/modules/auth-utils
