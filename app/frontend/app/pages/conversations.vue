@@ -133,6 +133,71 @@ const config = useRuntimeConfig()
 const hasuraData = ref<HasuraConversation[]>([])
 const refreshKey = ref(0)
 
+const isNewConversationDialogOpen = ref(false)
+const newConversationName = ref('')
+const isCreatingConversation = ref(false)
+
+async function createConversation() {
+  const userId = 1
+  
+  const mutation = `
+    mutation CreateConversation($name: String!, $userId: Int!) {
+      insert_conversations_one(object: { 
+        name: $name,
+        messages: {
+          data: {
+            message: "Hello! Start your new conversation."
+            user_id: $userId
+          }
+        }
+      }) {
+        id
+        name
+      }
+    }
+  `
+  
+  const hasuraUrl = config.public.hasuraUrl || 'http://localhost:8080'
+  const hasuraSecret = config.public.hasuraAdminSecret as string || 'hasura-dev-secret'
+  
+  try {
+    isCreatingConversation.value = true
+    
+    const response = await $fetch<{ data: { insert_conversations_one: { id: number; name: string } } }>(`${hasuraUrl}/v1/graphql`, {
+      method: 'POST',
+      body: { 
+        query: mutation, 
+        variables: { name: newConversationName.value || `Conversation ${Date.now()}`, userId } 
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-hasura-admin-secret': hasuraSecret
+      }
+    })
+    
+    if (response.data?.insert_conversations_one) {
+      toast.add({
+        title: 'Conversation created',
+        description: `Created "${response.data.insert_conversations_one.name}"`,
+        color: 'success'
+      })
+      
+      isNewConversationDialogOpen.value = false
+      newConversationName.value = ''
+      refreshKey.value++
+    }
+  } catch (err) {
+    console.error('Create conversation error:', err)
+    toast.add({
+      title: 'Error',
+      description: 'Failed to create conversation',
+      color: 'error'
+    })
+  } finally {
+    isCreatingConversation.value = false
+  }
+}
+
 function handleNewMessage(msg: Message) {
   if (!selectedConversation.value) return
   
@@ -306,7 +371,7 @@ onMounted(async () => {
       <UDashboardPanel id="conversations" side="left" resizable class="w-full sm:w-80 lg:w-96 shrink-0">
         <UDashboardNavbar title="Conversations">
           <template #right>
-            <UButton icon="i-lucide-pen-square" color="neutral" variant="ghost" />
+            <UButton icon="i-lucide-pen-square" color="neutral" variant="ghost" @click="isNewConversationDialogOpen = true" />
           </template>
         </UDashboardNavbar>
 
@@ -328,6 +393,20 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <UModal v-model:open="isNewConversationDialogOpen" title="New Conversation">
+      <template #body>
+        <div class="space-y-4">
+          <UFormField label="Conversation name (optional)">
+            <UInput v-model="newConversationName" placeholder="My new conversation" @keyup.enter="createConversation" />
+          </UFormField>
+          <div class="flex justify-end gap-2">
+            <UButton color="neutral" variant="ghost" label="Cancel" @click="isNewConversationDialogOpen = false" />
+            <UButton label="Create" :loading="isCreatingConversation" @click="createConversation" />
+          </div>
+        </div>
+      </template>
+    </UModal>
 
     <NotificationsSlideover />
   </UDashboardGroup>
