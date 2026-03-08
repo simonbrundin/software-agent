@@ -110,6 +110,9 @@ const groups = computed(() => [
 
 onMounted(async () => {
   const cookie = useCookie("cookie-consent");
+  // TODO: Set to empty string to show cookie banner again
+  cookie.value = "accepted";
+
   if (cookie.value === "accepted") {
     return;
   }

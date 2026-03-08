@@ -9,8 +9,6 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
-    hasuraUrl: process.env.HASURA_URL || 'http://localhost:8080',
-    hasuraAdminSecret: process.env.HASURA_ADMIN_SECRET || 'hasura-dev-secret',
     oauth: {
       github: {}
     },
@@ -24,6 +22,11 @@ export default defineNuxtConfig({
         path: '/'
       }
     }
+  },
+
+  public: {
+    hasuraUrl: process.env.HASURA_URL || 'http://localhost:8080',
+    hasuraAdminSecret: process.env.HASURA_ADMIN_SECRET || 'hasura-dev-secret'
   },
 
   auth: {

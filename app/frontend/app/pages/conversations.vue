@@ -1,4 +1,5 @@
 <script setup lang="ts">
+console.log('=== CONVERSATIONS PAGE LOADED ===')
 import type { NavigationMenuItem } from '@nuxt/ui'
 import type { Conversation, Message, User } from '~/types'
 
@@ -129,17 +130,19 @@ interface HasuraConversation {
 
 const config = useRuntimeConfig()
 
-const { data: hasuraData } = await useAsyncData<HasuraConversation[]>('conversations', async () => {
-  const userId = user.value?.id
+const hasuraData = ref<HasuraConversation[]>([])
+
+onMounted(async () => {
+  console.log('=== ONMOUNTED CALLED ===')
+  const userId = 1 // Hardcoded for testing
   
   const query = `
     query GetConversations($userId: Int!) {
       conversations(
         where: { 
-          _exists: {
-            table: messages
-            where: { user_id: { eq: $userId } }
-          }
+          messages: { 
+            user_id: { _eq: $userId } 
+          } 
         }
         order_by: { id: asc }
       ) {
@@ -160,15 +163,23 @@ const { data: hasuraData } = await useAsyncData<HasuraConversation[]>('conversat
       }
     }
   `
-  const response = await $fetch<{ data: { conversations: HasuraConversation[] } }>(`${config.hasuraUrl}/v1/graphql`, {
-    method: 'POST',
-    body: { query, variables: { userId } },
-    headers: {
-      'Content-Type': 'application/json',
-      'x-hasura-admin-secret': config.hasuraAdminSecret
-    }
-  })
-  return response.data.conversations
+  const hasuraUrl = config.public.hasuraUrl || 'http://localhost:8080'
+  const hasuraSecret = config.public.hasuraAdminSecret || 'hasura-dev-secret'
+  console.log('Fetching from:', hasuraUrl, 'with secret:', hasuraSecret)
+  try {
+    const response = await $fetch<{ data: { conversations: HasuraConversation[] } }>(`${hasuraUrl}/v1/graphql`, {
+      method: 'POST',
+      body: { query, variables: { userId } },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-hasura-admin-secret': hasuraSecret
+      }
+    })
+    console.log('Response:', response)
+    hasuraData.value = response.data.conversations
+  } catch (err) {
+    console.error('Fetch error:', err)
+  }
 })
 
 const conversations = computed<Conversation[]>(() => {
