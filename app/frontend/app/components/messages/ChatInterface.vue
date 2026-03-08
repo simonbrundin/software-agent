@@ -101,13 +101,6 @@ async function onSubmit() {
 
     emits('send-message', newMsg)
     newMessage.value = ''
-
-    toast.add({
-      title: 'Message sent',
-      description: 'Your message has been sent successfully',
-      icon: 'i-lucide-check-circle',
-      color: 'success'
-    })
   } catch (err) {
     console.error('Failed to send message:', err)
     toast.add({
