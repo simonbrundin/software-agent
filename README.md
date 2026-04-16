@@ -5,7 +5,7 @@
 - Commands: Markdown
 - Workflows: Python
 - Frontend: Nuxt (Vue)
-- Backend: Go
+- Backend: Python
 - Databas: PostgreSQL
 - ORM: Drizzle
 - Deployment / Orkestrering: Kubernetes
