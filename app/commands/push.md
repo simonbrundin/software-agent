@@ -1,48 +1,72 @@
 ---
 allowed-tools: Bash
-description: Kör git diff, commitar ändringar med ett lämpligt meddelande och pushar till remote
+description: Analyserar ändringar, grupperar per Conventional Commits och skapar separata commits per kategori
 ---
 
 # Push
 
 ## Syfte
 
-Detta kommando kör git diff för att visa vilka ändringar som gjorts, skapar ett lämpligt commit-meddelande baserat på ändringarna, commitar dem och pushar till remote. Använd när du vill stage:a, commita och pusha alla ändringar i ett steg.
+Analyserar git-ändringar, kategoriserar dem per Conventional Commits-typ (feat, fix, refactor, docs, chore, style), skapar separata commits med lämpliga meddelanden och pushar till remote.
 
 ## Variabler
 
- Inga dynamiska variabler - kommandot hanterar allt internt
+Inga dynamiska variabler - kommandot hanterar allt internt.
 
 ## Workflow
 
-1. Kör `git diff` för att se vilka ändringar som finns i working directory
-2. Kör `git diff --staged` för att se redan stagade ändringar
-3. Analysera outputten från git diff för att förstå vilka filer som ändrats
-4. Kör `git status --short` för en简洁 översikt av ändringar
-5. Skapa ett lämpligt commit-meddelande baserat på de ändrade filerna och typen av ändringar
-6. Kör `git add -A` för att staga alla ändringar
-7. Kör `git commit -m "<meddelande>"` med det skapade meddelandet
-8. Kör `git push` för att pusha till remote
-9. Rapportera resultatet till användaren
+### Steg 1: Analysera ändringar
+
+Kör för att se vilka filer som ändrats:
+```bash
+git status --short
+git diff --name-only
+```
+
+### Steg 2: Kategorisera per Conventional Commits-typ
+
+Agenten analyserar filer och grupperar dem:
+
+| Typ | Filer/Mönster |
+|-----|---------------|
+| **feat** | Nya filer, `.vue`, `.ts`, `.tsx`, nya komponenter, nya funktioner |
+| **fix** | `.py`, `.ts` med "fix", "bug", "error", patch-filer |
+| **refactor** | Omstrukturerade filer, filer med "refactor" i kontexten |
+| **docs** | `.md`, README, dokumentation |
+| **chore** | Config: `.json`, `.yaml`, `.toml`, `.env`, `.gitignore` |
+| **style** | `.css`, `.scss`, styling-filer |
+| **test** | Testfiler: `*.test.*`, `*.spec.*`, `test/`, `tests/` |
+
+### Steg 3: Gruppera och commita per typ
+
+För varje kategori med ändringar:
+```bash
+git add <filerna>
+git commit -m "<typ>: <sammanfattning>"
+```
+
+Agenten skapar en beskrivande sammanfattning baserat på filernas ändringar.
+
+### Steg 4: Pusha
+
+Efter alla commits:
+```bash
+git push
+```
+
+### Fallback
+
+Om endast en typ av ändring → gör en enda commit (befintligt beteende).
 
 ## Relevanta filer
 
-- `.git/` (för att förstå git-konfiguration om det behövs)
-
-## Exempel
-
-```bash
-git diff
-git status --short
-git add -A
-git commit -m "Update feature: add user authentication"
-git push
-```
+- `.git/` (vid behov för att förstå konfiguration)
 
 ## Rapport
 
 Kommandot ska svara med:
-- Sammanfattning av ändringar som hittades (filer ändrade, tillagda, borttagna)
-- Det commit-meddelande som användes
-- Bekräftelse på att commit och push lyckades
-- Eventuella varningar om inga ändringar hittades
+- Sammanfattning av ändringar som hittades (antal filer per kategori)
+- Antal commits som skapades
+- Commit-meddelanden som användes
+- Bekräftelse på att push lyckades
+- Varning om inga ändringar hittades
