@@ -11,6 +11,24 @@
 - Deployment / Orkestrering: Kubernetes
 - CI (GitHub Actions)
 
+## Kör igång dev
+
+```bash
+cd environments/dev
+tilt up
+```
+
+Detta startar alla tjänster via Docker Compose:
+
+- **PostgreSQL** på port 5432
+- **Hasura** (GraphQL) på port 8080
+- **Backend** (Python/FastAPI) på port 8000
+- **Frontend** (Nuxt) på port 3000
+
+För att stänga av: `tilt down`
+
+---
+
 ## Databas
 
 Schema Drawing:
