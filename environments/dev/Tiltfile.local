@@ -46,7 +46,7 @@ local_resource(
     PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()") &&
     DRIZZLE_PORT=$PORT bun run --cwd /home/simon/repos/software-agent/app/frontend db:studio
   ''',
-  links=['http://localhost:3003'],
+  links=['http://localhost:${DRIZZLE_PORT:-3003}'],
   labels=['Database'],
   resource_deps=['postgres'],
 )

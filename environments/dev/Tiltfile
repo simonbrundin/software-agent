@@ -8,7 +8,21 @@
 #   tilt up -- --mode=local          # Explicit lokal mode
 #   tilt up -- --mode=kubernetes     # Kör i Kubernetes
 #
+# Miljövariabler:
+#   TILT_PORT - Port för tilt (default: 10350)
+#   POSTGRES_PORT - Port för PostgreSQL (default: 5432)
+#   HASURA_PORT - Port för Hasura (default: 8080)
+#   BACKEND_PORT - Port för Backend (default: 8000)
+#   FRONTEND_PORT - Port för Frontend (default: 3000)
+#
 # ==================================================================
+
+# ------------------------------------------------------------------
+# Tilt Port
+# ------------------------------------------------------------------
+
+import os
+tilt_port = os.environ.get('TILT_PORT', '10350')
 
 # ------------------------------------------------------------------
 # Mode Selection
@@ -20,6 +34,7 @@ mode = cfg.get('mode', 'local')
 
 print('==========================================')
 print('Development Mode: ' + mode)
+print('Tilt Port: ' + tilt_port)
 print('==========================================')
 
 # ------------------------------------------------------------------
